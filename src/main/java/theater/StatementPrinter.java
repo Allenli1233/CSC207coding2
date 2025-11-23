@@ -37,8 +37,8 @@ public class StatementPrinter {
             volumeCredits += getVolumeCredits(p, volumeCredits);
 
             // print line for this order
-            result.append(String.format("  %s: %s (%s seats)%n", getPlay(p).name, frmt.format(getAmount(p, getPlay(p)) / 100), p.audience));
-            totalAmount += getAmount(p, getPlay(p));
+            result.append(String.format("  %s: %s (%s seats)%n", getPlay(p).name, frmt.format(getAmount(p) / 100), p.audience));
+            totalAmount += getAmount(p);
         }
         result.append(String.format("Amount owed is %s%n", frmt.format(totalAmount / 100)));
         result.append(String.format("You earned %s credits%n", volumeCredits));
@@ -61,9 +61,9 @@ public class StatementPrinter {
     }
 
     @SuppressWarnings({"checkstyle:ParameterName", "checkstyle:SuppressWarnings", "checkstyle:MagicNumber"})
-    private static int getAmount(Performance performance, Play play) {
+    private int getAmount(Performance performance) {
         int result = 0;
-        switch (play.type) {
+        switch (getPlay(performance).type) {
             case "tragedy":
                 result = 40000;
                 if (performance.audience > Constants.TRAGEDY_AUDIENCE_THRESHOLD) {
@@ -80,8 +80,10 @@ public class StatementPrinter {
                 result += Constants.COMEDY_AMOUNT_PER_AUDIENCE * performance.audience;
                 break;
             default:
-                throw new RuntimeException(String.format("unknown type: %s", play.type));
+                throw new RuntimeException(
+                        String.format("unknown type: %s", getPlay(performance).type));
         }
         return result;
     }
+
 }
