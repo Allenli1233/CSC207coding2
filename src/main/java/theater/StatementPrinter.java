@@ -28,7 +28,10 @@ public class StatementPrinter {
         StringBuilder result = new StringBuilder("Statement for " + invoice.getCustomer() + System.lineSeparator());
         for (Performance p : invoice.getPerformances()) {
 
-            result.append(String.format("  %s: %s (%s seats)%n", getPlay(p).name, usd(getAmount(p)), p.audience));
+            result.append(String.format("  %s: %s (%s seats)%n",
+                    getPlay(p).getName(),
+                    usd(getAmount(p)),
+                    p.getAudience()));
 
         }
         result.append(String.format("Amount owed is %s%n", usd(getTotalAmount())));
@@ -63,40 +66,40 @@ public class StatementPrinter {
     @SuppressWarnings({"checkstyle:ParameterName", "checkstyle:SuppressWarnings"})
     private int getVolumeCredits(Performance performance, int volumeCredits) {
         int result = 0;
-        result += Math.max(performance.audience - Constants.BASE_VOLUME_CREDIT_THRESHOLD, 0);
-        if ("comedy".equals(getPlay(performance).type)) {
-            result += performance.audience / Constants.COMEDY_EXTRA_VOLUME_FACTOR;
+        result += Math.max(performance.getAudience() - Constants.BASE_VOLUME_CREDIT_THRESHOLD, 0);
+        if ("comedy".equals(getPlay(performance).getType())) {
+            result += performance.getAudience() / Constants.COMEDY_EXTRA_VOLUME_FACTOR;
         }
         return result;
     }
 
     @SuppressWarnings({"checkstyle:ParameterName", "checkstyle:SuppressWarnings"})
     private Play getPlay(Performance p) {
-        return plays.get(p.playID);
+        return plays.get(p.getPlayID());
     }
 
     @SuppressWarnings({"checkstyle:ParameterName", "checkstyle:SuppressWarnings", "checkstyle:MagicNumber"})
     private int getAmount(Performance performance) {
         int result = 0;
-        switch (getPlay(performance).type) {
+        switch (getPlay(performance).getType()) {
             case "tragedy":
                 result = 40000;
-                if (performance.audience > Constants.TRAGEDY_AUDIENCE_THRESHOLD) {
-                    result += 1000 * (performance.audience - 30);
+                if (performance.getAudience() > Constants.TRAGEDY_AUDIENCE_THRESHOLD) {
+                    result += 1000 * (performance.getAudience() - 30);
                 }
                 break;
             case "comedy":
                 result = Constants.COMEDY_BASE_AMOUNT;
-                if (performance.audience > Constants.COMEDY_AUDIENCE_THRESHOLD) {
+                if (performance.getAudience() > Constants.COMEDY_AUDIENCE_THRESHOLD) {
                     result += Constants.COMEDY_OVER_BASE_CAPACITY_AMOUNT
                             + (Constants.COMEDY_OVER_BASE_CAPACITY_PER_PERSON
-                            * (performance.audience - Constants.COMEDY_AUDIENCE_THRESHOLD));
+                            * (performance.getAudience() - Constants.COMEDY_AUDIENCE_THRESHOLD));
                 }
-                result += Constants.COMEDY_AMOUNT_PER_AUDIENCE * performance.audience;
+                result += Constants.COMEDY_AMOUNT_PER_AUDIENCE * performance.getAudience();
                 break;
             default:
                 throw new RuntimeException(
-                        String.format("unknown type: %s", getPlay(performance).type));
+                        String.format("unknown type: %s", getPlay(performance).getType()));
         }
         return result;
     }
